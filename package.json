@@ -1,0 +1,32 @@
+{
+  "name": "titanium-indexly",
+  "version": "1.0.4",
+  "description": "A modern, lightweight, and extensible abstraction layer for IndexedDB.",
+  "main": "titanium-indexly.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "indexeddb",
+    "storage",
+    "database",
+    "browser",
+    "client-side",
+    "data",
+    "crud",
+    "localstorage",
+    "titanium",
+    "indexly"
+  ],
+  "author": "Titanium Projects",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/titanium-projects/titanium-indexly.git"
+  },
+  "bugs": {
+    "url": "https://github.com/titanium-projects/titanium-indexly/issues"
+  },
+  "homepage": "https://github.com/titanium-projects/titanium-indexly#readme"
+}
