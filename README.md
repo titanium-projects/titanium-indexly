@@ -12,11 +12,14 @@ GitHub Repository → [https://github.com/titanium-projects/titanium-indexly](ht
 ---
 
 ## ✨ Features
-- 🚀 Use IndexedDB the modern JavaScript way
+- 🚀 Modern IndexedDB usage with zero boilerplate
 - ✅ Simple API: `add`, `put`, `delete`, `get`, `getAll`, `where`
 - ⚖️ Filtering, sorting, pagination with `where`
+- 🧠 Automatic versioning based on missing object stores
+- 🔁 Supports both dynamic and static version handling
+- 🔄 Dynamically add new stores during runtime via version auto-increment
 - 🧱 Dynamic store access via Proxy
-- ✈️ Lightweight, dependency-free, and ready to use
+- 📦 UMD and ESM module support via Rollup bundling
 
 ---
 
@@ -28,32 +31,38 @@ npm install titanium-indexly
 
 ---
 
-## 🔍 Basic Usage
+## 🔧 Usage
 
-### 1. Import the module
+### 1. Import the module (ESM)
 ```js
 import TitaniumIndexly from 'titanium-indexly';
 ```
 
-### 2. Initialize the database
+Or use directly in the browser (UMD):
+```html
+<script src="./dist/titanium-indexly.umd.js"></script>
+<script>
+  const db = window.TitaniumIndexly({ name: 'mydb', stores: ['users'] });
+</script>
+```
+
+---
+
+## 📚 Example
+
 ```js
 const db = TitaniumIndexly({
   name: 'myAppDb',
   stores: ['users', 'products']
 });
-```
 
-### 3. Add data
-```js
 await db.users.add({ name: 'Kerem', age: 27 });
-```
 
-### 4. Query data
-```js
 const results = await db.products.where(
   (p) => p.model > 2010,
   { limit: 5, sortBy: 'model' }
 );
+console.log(results);
 ```
 
 ---
@@ -85,24 +94,76 @@ Filters and retrieves records based on a condition.
 
 ---
 
-## 📘 Example
+## 🔁 Static vs Dynamic Versioning
+
+Titanium Indexly supports two ways to manage IndexedDB versioning:
+
+### 🔧 Static Versioning (Manual)
+You provide a fixed version number:
 ```js
-const db = TitaniumIndexly({ name: 'demo', stores: ['tasks'] });
-
-await db.tasks.add({ title: 'Coding class', done: false });
-await db.tasks.add({ title: 'Grocery shopping', done: true });
-
-const pendingTasks = await db.tasks.where(
-  t => !t.done,
-  { sortBy: 'title' }
-);
-console.log(pendingTasks);
+TitaniumIndexly({
+  name: 'appdb',
+  version: 2,
+  stores: ['users', 'products']
+});
 ```
+Use this when you want full control over schema updates.
+
+### ⚙️ Dynamic Versioning (Auto)
+No `version` field is provided:
+```js
+TitaniumIndexly({
+  name: 'appdb',
+  stores: ['users']
+});
+```
+The library automatically:
+- Reads existing store list and version
+- Detects missing stores
+- Increments version only if new stores are needed
+
+---
+
+## 🧠 Dynamically Adding New Stores
+With dynamic versioning, you can safely add new stores later:
+```js
+TitaniumIndexly({
+  name: 'appdb',
+  stores: ['users', 'products', 'orders'] // 'orders' is new
+});
+```
+Titanium Indexly will compare current database schema and auto-increment version if needed.
+
+> ⚠️ With static versioning, you must manually increase the `version` number when adding new stores.
+
+---
+
+## 🛠 Development
+
+This package uses [Rollup](https://rollupjs.org/) to generate both ESM and UMD builds.
+
+To build:
+```bash
+npm run build
+```
+Output goes to the `dist/` folder.
 
 ---
 
 ## ⚙️ Contributing
 Pull requests and issues are welcome! Feel free to fork and contribute to improve the project.
+
+---
+
+## 📁 Project Structure
+```
+titanium-indexly/
+├── src/              # Source code (ES6)
+├── dist/             # Compiled outputs (ESM + UMD)
+├── demo.html         # Browser demo
+├── rollup.config.js  # Bundler config
+└── package.json
+```
 
 ---
 
