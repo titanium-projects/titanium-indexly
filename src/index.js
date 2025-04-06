@@ -70,6 +70,9 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
     clear: {
       mode: DBMode.ReadWrite,
     },
+    count: {
+      mode: DBMode.ReadOnly,
+    },
     where: {
       mode: DBMode.ReadOnly,
       isOptions: true,
