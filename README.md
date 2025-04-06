@@ -13,7 +13,7 @@ GitHub Repository → [https://github.com/titanium-projects/titanium-indexly](ht
 
 ## ✨ Features
 - 🚀 Modern IndexedDB usage with zero boilerplate
-- ✅ Simple API: `add`, `put`, `delete`, `clear`, `get`, `getAll`, `where`
+- ✅ Simple API: `add`, `put`, `delete`, `clear`, `get`, `getAll`, `count`, `where`
 - ⚖️ Filtering, sorting, pagination with `where`
 - 🧠 Automatic versioning based on missing object stores
 - 🔁 Supports both dynamic and static version handling
@@ -93,6 +93,18 @@ console.log(allUsers);
   { id: 2, name: 'Ayşe', age: 25 }
 ] */
 ```
+
+### 🔹 `count()`
+Returns the total number of records in the store.
+```js
+const total = await db.users.count();
+console.log(total); // ➜ 2
+```
+
+#### ✅ When to use `count()` vs `getAll().length`
+- `count()` is more **performant and memory-efficient**, especially for large datasets.
+- `getAll()` loads all data into memory just to count it, which is unnecessary if you only need the total.
+- 💡 Use `count()` if you don’t need the actual data, only the total number.
 
 ### 🔹 `clear()`
 Delete all records in the store.
@@ -203,3 +215,4 @@ titanium-indexly/
 ## 📢 License
 
 MIT
+
