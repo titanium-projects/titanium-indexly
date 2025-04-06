@@ -1,11 +1,44 @@
-const TitaniumIndexly = function ({ name, stores }) {
+const TitaniumIndexly = function ({ name, stores, version }) {
   const databaseName = name || "localdb";
+  const isDynamicVersion = !version;
   const dbSet = Array.isArray(stores) ? stores : [];
   const DBContext = {};
   const DBMode = Object.freeze({
     ReadWrite: "readwrite",
     ReadOnly: "readonly",
   });
+
+  let databaseVersion = version || 1;
+  let dbVersionChecked = false;
+
+  const getDBInfo = function () {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(databaseName);
+
+      request.onsuccess = (e) => {
+        const db = e.target.result;
+        const existingStores = Array.from(db.objectStoreNames);
+        const version = db.version;
+        db.close();
+        resolve({ existingStores, version });
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  };
+
+  const updateDbVersion = async function () {
+    const { existingStores, version } = await getDBInfo();
+    const missingStores = dbSet.filter((s) => !existingStores.includes(s));
+
+    const shouldUpgrade = missingStores.length > 0;
+    databaseVersion = shouldUpgrade ? version + 1 : version;
+
+    if (shouldUpgrade) {
+      instance?.close();
+      instance = null;
+    }
+  };
 
   const ActionTypes = {
     add: {
@@ -123,13 +156,18 @@ const TitaniumIndexly = function ({ name, stores }) {
     });
   };
 
-  const openDB = function (callback) {
+  const openDB = async function (callback) {
+    if (isDynamicVersion && !dbVersionChecked) {
+      await updateDbVersion();
+      dbVersionChecked = true;
+    }
+
     if (instance) {
       callback(instance);
       return;
     }
 
-    const request = indexedDB.open(databaseName, 2);
+    const request = indexedDB.open(databaseName, databaseVersion);
 
     request.onupgradeneeded = function (event) {
       const db = event.target.result;
@@ -148,6 +186,10 @@ const TitaniumIndexly = function ({ name, stores }) {
         console.log("Database initialized");
         callback(instance);
       }
+    };
+
+    request.onblocked = () => {
+      console.warn("Database upgrade blocked by another tab.");
     };
 
     request.onerror = function (event) {

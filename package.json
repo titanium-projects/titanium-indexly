@@ -1,10 +1,16 @@
 {
   "name": "titanium-indexly",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A modern, lightweight, and extensible abstraction layer for IndexedDB.",
-  "main": "titanium-indexly.js",
+  "main": "dist/titanium-indexly.umd.js",
+  "module": "dist/titanium-indexly.esm.js",
+  "exports": {
+    "import": "./dist/titanium-indexly.esm.js",
+    "require": "./dist/titanium-indexly.umd.js"
+  },
   "type": "module",
   "scripts": {
+    "build": "rollup -c",
     "test": "echo \"No tests yet\""
   },
   "keywords": [
@@ -28,5 +34,12 @@
   "bugs": {
     "url": "https://github.com/titanium-projects/titanium-indexly/issues"
   },
-  "homepage": "https://github.com/titanium-projects/titanium-indexly#readme"
+  "homepage": "https://github.com/titanium-projects/titanium-indexly#readme",
+  "devDependencies": {
+    "rollup": "^4.39.0"
+  },
+  "files": [
+    "dist/",
+    "src/"
+  ]
 }
