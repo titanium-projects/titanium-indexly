@@ -13,11 +13,12 @@ GitHub Repository → [https://github.com/titanium-projects/titanium-indexly](ht
 
 ## ✨ Features
 - 🚀 Modern IndexedDB usage with zero boilerplate
-- ✅ Simple API: `add`, `put`, `delete`, `get`, `getAll`, `where`
+- ✅ Simple API: `add`, `put`, `delete`, `clear`, `get`, `getAll`, `where`
 - ⚖️ Filtering, sorting, pagination with `where`
 - 🧠 Automatic versioning based on missing object stores
 - 🔁 Supports both dynamic and static version handling
 - 🔄 Dynamically add new stores during runtime via version auto-increment
+- 🔥 Drop (delete) stores during upgrade using `dropStores` option
 - 🧱 Dynamic store access via Proxy
 - 📦 UMD and ESM module support via Rollup bundling
 
@@ -53,7 +54,8 @@ Or use directly in the browser (UMD):
 ```js
 const db = TitaniumIndexly({
   name: 'myAppDb',
-  stores: ['users', 'products']
+  stores: ['users', 'products'],
+  dropStores: ['oldStore'] // 🔥 this store will be deleted if it exists
 });
 
 await db.users.add({ name: 'Kerem', age: 27 });
@@ -63,6 +65,8 @@ const results = await db.products.where(
   { limit: 5, sortBy: 'model' }
 );
 console.log(results);
+
+await db.users.clear(); // ✅ deletes all users in the store
 ```
 
 ---
@@ -77,6 +81,9 @@ Updates a record (requires `id`).
 
 ### `delete(id)`
 Deletes the record by ID.
+
+### `clear()`
+Deletes all records in the store.
 
 ### `get(id)`
 Fetches a record by ID.
@@ -124,17 +131,28 @@ The library automatically:
 
 ---
 
-## 🧠 Dynamically Adding New Stores
-With dynamic versioning, you can safely add new stores later:
+## 🧠 Dynamically Adding or Removing Stores
+
+### ➕ Adding a New Store
+With dynamic versioning:
 ```js
 TitaniumIndexly({
   name: 'appdb',
-  stores: ['users', 'products', 'orders'] // 'orders' is new
+  stores: ['users', 'orders'] // 'orders' will be added if missing
 });
 ```
-Titanium Indexly will compare current database schema and auto-increment version if needed.
 
-> ⚠️ With static versioning, you must manually increase the `version` number when adding new stores.
+### ❌ Removing a Store
+Use the `dropStores` option:
+```js
+TitaniumIndexly({
+  name: 'appdb',
+  stores: ['users'],
+  dropStores: ['products'] // 'products' store will be deleted
+});
+```
+
+> ⚠️ With static versioning, you must manually increase the version number to trigger the removal.
 
 ---
 

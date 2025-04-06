@@ -1,4 +1,4 @@
-const TitaniumIndexly = function ({ name, stores, version }) {
+const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
   const databaseName = name || "localdb";
   const isDynamicVersion = !version;
   const dbSet = Array.isArray(stores) ? stores : [];
@@ -55,6 +55,9 @@ const TitaniumIndexly = function ({ name, stores, version }) {
     },
     getAll: {
       mode: DBMode.ReadOnly,
+    },
+    clear: {
+      mode: DBMode.ReadWrite,
     },
     where: {
       mode: DBMode.ReadOnly,
@@ -172,6 +175,16 @@ const TitaniumIndexly = function ({ name, stores, version }) {
     request.onupgradeneeded = function (event) {
       const db = event.target.result;
 
+      // Delete Stores
+      if (Array.isArray(dropStores)) {
+        dropStores.forEach((s) => {
+          if (db.objectStoreNames.contains(s)) {
+            db.deleteObjectStore(s);
+          }
+        });
+      }
+
+      // Add Stores
       dbSet.forEach((key) => {
         if (!db.objectStoreNames.contains(key)) {
           db.createObjectStore(key, { autoIncrement: true });
