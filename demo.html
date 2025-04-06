@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Titanium Indexly Demo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f8fa;
+      padding: 40px;
+      color: #333;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    button {
+      background-color: #4caf50;
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      margin: 8px 4px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      margin-top: 20px;
+      background: #fff;
+      padding: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: #444;
+    }
+  </style>
+  <script type="module">
+    import TitaniumIndexly from './src/index.js';
+
+    const db = TitaniumIndexly({
+      name: 'demoDB',
+      stores: ['users']
+    });
+
+    window.addUser = async function () {
+      const id = await db.users.add({ name: 'Kerem', age: Math.floor(Math.random() * 30 + 18) });
+      console.log('Added user with ID:', id);
+      getUsers();
+    };
+
+    window.getUsers = async function () {
+      const users = await db.users.getAll();
+      console.log('All users:', users);
+      renderOutput(users);
+    };
+
+    window.countUsers = async function () {
+      const count = await db.users.count();
+      console.log('Total users:', count);
+      document.getElementById('output').innerText = `Total users: ${count}`;
+    };
+
+    window.clearUsers = async function () {
+      await db.users.clear();
+      console.log('All users cleared');
+      document.getElementById('output').innerText = 'All users cleared';
+    };
+
+    function renderOutput(data) {
+      document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</head>
+<body>
+  <h1>🧪 Titanium Indexly Demo</h1>
+  <button onclick="addUser()">➕ Add User</button>
+  <button onclick="getUsers()">📋 Get All Users</button>
+  <button onclick="countUsers()">🔢 Count Users</button>
+  <button onclick="clearUsers()">🗑️ Clear Users</button>
+
+  <pre id="output"></pre>
+</body>
+</html>
