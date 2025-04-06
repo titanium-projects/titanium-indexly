@@ -17,8 +17,7 @@ GitHub Repository → [https://github.com/titanium-projects/titanium-indexly](ht
 - ⚖️ Filtering, sorting, pagination with `where`
 - 🧠 Automatic versioning based on missing object stores
 - 🔁 Supports both dynamic and static version handling
-- 🔄 Dynamically add new stores during runtime via version auto-increment
-- 🔥 Drop (delete) stores during upgrade using `dropStores` option
+- 🔄 Dynamically add or delete object stores with `dropStores`
 - 🧱 Dynamic store access via Proxy
 - 📦 UMD and ESM module support via Rollup bundling
 
@@ -34,12 +33,12 @@ npm install titanium-indexly
 
 ## 🔧 Usage
 
-### 1. Import the module (ESM)
+### Import (ESM)
 ```js
 import TitaniumIndexly from 'titanium-indexly';
 ```
 
-Or use directly in the browser (UMD):
+### Or use in browser
 ```html
 <script src="./dist/titanium-indexly.umd.js"></script>
 <script>
@@ -49,55 +48,77 @@ Or use directly in the browser (UMD):
 
 ---
 
-## 📚 Example
+## 📚 Basic Example
 
 ```js
 const db = TitaniumIndexly({
   name: 'myAppDb',
   stores: ['users', 'products'],
-  dropStores: ['oldStore'] // 🔥 this store will be deleted if it exists
+  dropStores: ['oldStore']
 });
-
-await db.users.add({ name: 'Kerem', age: 27 });
-
-const results = await db.products.where(
-  (p) => p.model > 2010,
-  { limit: 5, sortBy: 'model' }
-);
-console.log(results);
-
-await db.users.clear(); // ✅ deletes all users in the store
 ```
 
 ---
 
-## 💡 API Reference
+## 🧪 API Usage with Sample Output
 
-### `add(data)`
-Adds a new record.
+### 🔹 `add(data)`
+Add a new record to a store.
+```js
+const id = await db.users.add({ name: 'Kerem', age: 27 });
+console.log(id); // ➜ 1 (auto-generated ID)
+```
 
-### `put(data)`
-Updates a record (requires `id`).
+### 🔹 `put(data)`
+Update an existing record.
+```js
+await db.users.put({ id: 1, name: 'Kerem', age: 28 });
+```
 
-### `delete(id)`
-Deletes the record by ID.
+### 🔹 `get(id)`
+Retrieve a record by ID.
+```js
+const user = await db.users.get(1);
+console.log(user); 
+// ➜ { name: 'Kerem', age: 28 }
+```
 
-### `clear()`
-Deletes all records in the store.
+### 🔹 `getAll()`
+Fetch all records in a store. Includes their `id`s.
+```js
+const allUsers = await db.users.getAll();
+console.log(allUsers);
+/* ➜ [
+  { id: 1, name: 'Kerem', age: 28 },
+  { id: 2, name: 'Ayşe', age: 25 }
+] */
+```
 
-### `get(id)`
-Fetches a record by ID.
+### 🔹 `clear()`
+Delete all records in the store.
+```js
+await db.users.clear();
+```
 
-### `getAll()`
-Fetches all records.
+### 🔹 `delete(id)`
+Delete a single record by ID.
+```js
+await db.users.delete(1);
+```
 
-### `where(predicateFn, options)`
-Filters and retrieves records based on a condition.
-
-**Options:**
-- `limit`: Max number of results to return
-- `offset`: Skip the first N results
-- `sortBy`: Field name to sort by
+### 🔹 `where(fn, options)`
+Filter records with additional options like sorting and pagination.
+```js
+const filtered = await db.products.where(
+  (item) => item.price > 100,
+  { limit: 5, offset: 0, sortBy: 'price' }
+);
+console.log(filtered);
+/* ➜ [
+  { id: 3, name: 'Tablet', price: 120 },
+  { id: 5, name: 'Monitor', price: 180 }
+] */
+```
 
 ---
 
@@ -105,8 +126,7 @@ Filters and retrieves records based on a condition.
 
 Titanium Indexly supports two ways to manage IndexedDB versioning:
 
-### 🔧 Static Versioning (Manual)
-You provide a fixed version number:
+### Static Versioning (Manual)
 ```js
 TitaniumIndexly({
   name: 'appdb',
@@ -114,62 +134,57 @@ TitaniumIndexly({
   stores: ['users', 'products']
 });
 ```
-Use this when you want full control over schema updates.
 
-### ⚙️ Dynamic Versioning (Auto)
-No `version` field is provided:
+### Dynamic Versioning (Auto)
 ```js
 TitaniumIndexly({
   name: 'appdb',
   stores: ['users']
 });
 ```
-The library automatically:
-- Reads existing store list and version
-- Detects missing stores
-- Increments version only if new stores are needed
+The library will:
+- Check existing stores and version
+- Automatically increment version if needed
 
 ---
 
-## 🧠 Dynamically Adding or Removing Stores
+## ➕ Adding or ❌ Removing Stores
 
-### ➕ Adding a New Store
-With dynamic versioning:
+### Add a New Store
 ```js
 TitaniumIndexly({
   name: 'appdb',
-  stores: ['users', 'orders'] // 'orders' will be added if missing
+  stores: ['users', 'orders']
 });
 ```
 
-### ❌ Removing a Store
-Use the `dropStores` option:
+### Remove a Store
 ```js
 TitaniumIndexly({
   name: 'appdb',
   stores: ['users'],
-  dropStores: ['products'] // 'products' store will be deleted
+  dropStores: ['products']
 });
 ```
 
-> ⚠️ With static versioning, you must manually increase the version number to trigger the removal.
+> ⚠️ For static versioning, you must manually bump the version number to trigger the schema update.
 
 ---
 
 ## 🛠 Development
 
-This package uses [Rollup](https://rollupjs.org/) to generate both ESM and UMD builds.
-
-To build:
+To build the project with Rollup:
 ```bash
 npm run build
 ```
-Output goes to the `dist/` folder.
+
+Output will be available in the `dist/` folder.
 
 ---
 
-## ⚙️ Contributing
-Pull requests and issues are welcome! Feel free to fork and contribute to improve the project.
+## 🤝 Contributing
+
+We welcome all contributions! Feel free to open issues or submit pull requests to improve Titanium Indexly.
 
 ---
 
@@ -179,17 +194,12 @@ titanium-indexly/
 ├── src/              # Source code (ES6)
 ├── dist/             # Compiled outputs (ESM + UMD)
 ├── demo.html         # Browser demo
-├── rollup.config.js  # Bundler config
+├── rollup.config.js  # Rollup build configuration
 └── package.json
 ```
 
 ---
 
-## 🚫 Dependencies
-None. Pure Vanilla JS + IndexedDB API.
-
----
-
 ## 📢 License
-MIT
 
+MIT

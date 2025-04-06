@@ -55,6 +55,17 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
     },
     getAll: {
       mode: DBMode.ReadOnly,
+      isOptions: true,
+      cursor: function ({ event, resolve, results }) {
+        const cursor = event.target.result;
+
+        if (cursor) {
+          results.push({ id: cursor.key, ...cursor.value });
+          cursor.continue();
+        } else {
+          resolve(results);
+        }
+      },
     },
     clear: {
       mode: DBMode.ReadWrite,
@@ -70,7 +81,7 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
 
           try {
             if (predicateFn(value)) {
-              results.push(value);
+              results.push({ id: cursor.key, ...value });
             }
           } catch (err) {
             console.warn("Error in filter function:", err);
