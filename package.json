@@ -1,6 +1,6 @@
 {
   "name": "titanium-indexly",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A modern, lightweight, and extensible abstraction layer for IndexedDB.",
   "main": "dist/titanium-indexly.umd.js",
   "module": "dist/titanium-indexly.esm.js",
