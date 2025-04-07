@@ -55,17 +55,6 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
     },
     getAll: {
       mode: DBMode.ReadOnly,
-      isOptions: true,
-      cursor: function ({ event, resolve, results }) {
-        const cursor = event.target.result;
-
-        if (cursor) {
-          results.push({ id: cursor.key, ...cursor.value });
-          cursor.continue();
-        } else {
-          resolve(results);
-        }
-      },
     },
     clear: {
       mode: DBMode.ReadWrite,
@@ -84,7 +73,7 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
 
           try {
             if (predicateFn(value)) {
-              results.push({ id: cursor.key, ...value });
+              results.push(value);
             }
           } catch (err) {
             console.warn("Error in filter function:", err);
@@ -201,7 +190,7 @@ const TitaniumIndexly = function ({ name, stores, version, dropStores }) {
       // Add Stores
       dbSet.forEach((key) => {
         if (!db.objectStoreNames.contains(key)) {
-          db.createObjectStore(key, { autoIncrement: true });
+          db.createObjectStore(key, { autoIncrement: true, keyPath: "id" });
         }
       });
     };
